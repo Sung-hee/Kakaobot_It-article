@@ -132,5 +132,131 @@
 >
 >
 >
+
+
+
+### 전에 안되던 코드 수정 및 button 형식 봇 완성코드 !
+
+>1. parser.rb 수정하기
 >
+>```ruby
+>module Parser
+>  class Itnews
+>    def techneedle
+>      .....
+>      news = Hash.new
+>      # 해쉬에서 value 값들을 담기 위한 배열 
+>      titles = Array.new
+>      images = Array.new
+>      urls = Array.new
+>          
+>      doc.css("div.masonry-wrapper > article").each do |article|
+>        news[article.css("header > h1 > a").text] = {
+>        :title => article.css("header > h1 > a").text,
+>        :img => article.css("figure > a > img").attribute('src').to_s,
+>        :url => article.css("header > h1 > a")[0]['href']
+>        }
+>      end
+>      # puts news.inspect
+>      # 해쉬 반복을 통해서 배열에 value 값들을 담아주고
+>      news.each do |key, value|
+>        titles <<  news[key][:title]
+>        images << news[key][:img]
+>        urls << news[key][:url]
+>      end
+>      # 무작위로 하나를 뽑아 반환하자
+>      return_text =  titles.sample
+>      img_url =  images.sample
+>      link_url = urls.sample
+>      
+>      return [return_text, img_url, link_url]
+>    end
+>  end
+>end
+>```
+>
+>#### 전의 코드에서 Null값이 나왔던 이유는 무엇일까 ?
+>
+>```ruby
+># 변경 전
+>doc.css("div.masonry-wrapper article").each do |article|
+>  news[article.css("header h1.entry-title a").text] = {
+>    :title => article.css("div header h1.entry-header a"),
+>    :img => article.css("figure.post-thumbnail").to_s
+>  }
+>end
+># 변경 후
+>doc.css("div.masonry-wrapper > article").each do |article|
+>  news[article.css("header > h1 > a").text] = {
+>    :title => article.css("header > h1 > a").text,
+>    :img => article.css("figure > a > img").attribute('src').to_s,
+>    :url => article.css("header > h1 > a")[0]['href']
+>  }
+>end
+>```
+>
+>위에 코드와 같이 우선 접근 방법 시 '>' 가 붙었으며 클래스 명으로 접근하지 않고 태그들로 접근했다 !
+>
+>아직까진 정확히 무슨 차이인지는 잘 모르겠다....ㅋ 무튼 해결함 !
+>
+>  
+>
+>2.  kakao_controller.rb 수정하기
+>
+>```ruby
+>def message
+>  ....
+>  if user_msg = "it핫이슈"
+>    image = true
+>    techneedle_news = Parser::Itnews.new
+>    news_info = techneedle_news.techneedle
+>      
+>    return_text = news_info[0]
+>    img_url = news_info[1]
+>    link_url = news_info[2]
+>  end
+>  
+>  home_keyboard = {
+>    :type => "buttons",
+>    :buttons => ["챗봇"]
+>  }
+>  
+>  return_message_with_img = {
+>    :message => {
+>      :text => return_text,
+>      :photo => {
+>      :url => img_url,
+>      :width => 640,
+>      :height => 480
+>      },
+>      :message_button => {
+>        :label => "기사 더보기",
+>        :url => link_url
+>        }
+>      },
+>      :keyboard => home_keyboard
+>    }
+>  return_message = {
+>    :message => {
+>      :text => return_text
+>    },
+>    :keyboard => home_keyboard
+>  }
+>  if image
+>    render json: return_message_with_img
+>  else
+>    render json: return_message
+>  end
+>end
+>```
+>
+>
+>
+>
+>
+>
+>
+>
+
+
 
