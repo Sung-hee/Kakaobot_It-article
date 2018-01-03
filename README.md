@@ -250,13 +250,58 @@
 >end
 >```
 >
+> 
+
+### 세번째 수정 !
+
+> 오류를 발견했다 !
 >
+> ```ruby
+> return_text =  titles.sample
+> img_url =  images.sample
+> link_url = urls.sample
+> ```
 >
+> 이 코드는 배열에 저장되어있는 값들 중 하나를 랜덤으로 뽑아서 각각 변수에 저장해주는 코드이다 !
 >
+> 결과적으로 text와 img_url, link_url 세개의 변수가 각각 똑같은 기사에서 값들을 가져와야 하는데 
 >
+> sample 이란 함수 덕분에 서로 다른 값들을 가져와 버린다. 
 >
+> 그래서 코드를 수정했다 !
 >
+> #### 수정된 코드
 >
+> ```ruby
+> news = Hash.new
+> titles = Array.new
+>
+> doc.css("div.masonry-wrapper > article").each do |article|
+>   news[article.css("header > h1 > a").text] = {
+>     :title => article.css("header > h1 > a").text,
+>     :img => article.css("figure > a > img").attribute('src').to_s,
+>     :url => article.css("header > h1 > a")[0]['href']  
+>   }
+> end
+>
+> # 타이틀만 뽑아 titles 배열에 값들을 저장하고
+> doc.css("div.masonry-wrapper > article > header > h1 > a").each do |title|
+>   titles << title.text
+> end
+> # 저장된 값들을 무작위로 하나 뽑는다.
+> news_info = titles.sample
+> # 그리고 무작위로 뽑은 값 하나를 news해쉬의 key에 넣어주고 
+> # key를 이용해 저장된 value 값들을 뽑아서 반환해준다.
+> return_text = news[news_info][:title]
+> img_url = news[news_info][:img]
+> link_url = news[news_info][:url]
+>   
+> return [return_text, img_url, link_url]
+> ```
+>
+> 이러면 진짜 완성 !  이제부터는 button 타입을 text 타입으로 바꿔 카카오톡에서 텍스트가 들어오면 해당 텍스트로 기사들을 검사하여 보여주는 봇으로 바꾸겠음 !
+
+
 
 
 
