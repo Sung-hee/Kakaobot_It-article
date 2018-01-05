@@ -305,3 +305,70 @@
 
 
 
+## 완성본 ! 마지막 수정 !
+
+>이걸 마지막으로 이 챗봇은 완성 !
+>
+>이제는 button 타입에서 text타입으로 변경하여 사용자가 text를 입력하면 해당 기사를 가져올 수 있도록 변경하겠습니다. 
+>
+>1. controller.rb 수정하기
+>
+>```ruby
+>def keyboard  
+>  home_keyboard = {
+>    :type => "text"
+>  }
+>  render json: home_keyboard
+>end
+>
+>def message
+>  .....
+>  home_keyboard = {
+>    :type => "text"
+>  }
+>  return_message_with_img = {
+>    :message => {
+>      :text => return_text,
+>      :photo => {
+>        :url => img_url,
+>        :width => 640,
+>        :height => 480
+>       },
+>      :message_button => {
+>        :label => "기사 더보기",
+>        :url => link_url
+>      }
+>    },
+>   :keyboard => home_keyboard
+>  }
+>  ....
+>end
+>```
+>
+>2. parser.rb 수정하기
+>
+>```ruby
+># 함수에 파라미터를 지정하여 컨트롤러에서의 user_msg를 사용하여 사용자가 입력한 텍스트를 활용하도록 합시다 !
+>def techneedle(user_msg)
+>  encode = URI.encode("#{user_msg}")
+>  doc.css("div.masonry-wrapper > article").each do |article|
+>    # 여기는 기사에서 이미지가 없을 때 
+>    if article.css('figure > a > img').empty
+>      news[article.css("header > h1 > a").text] = {
+>        :title => article.css("header > h1 > a").text,
+>        :img => "",
+>        :url => article.css("header > h1 > a")[0]['href']
+>      } 
+>    # 여기는 기사에 이미지가 있을 때
+>    else
+>      news[article.css("header > h1 > a").text] = {
+>        :title => article.css("header > h1 > a").text,
+>        :img => article.css('figure > a > img').attr('src').to_s,
+>        :url => article.css("header > h1 > a")[0]['href']
+>      }  
+>    end
+>end
+>```
+>
+>3. 끝 ! 
+
